@@ -4,9 +4,10 @@ module.exports = {
         : '/',
     outputDir: 'dist',
     assetsDir: 'js',
-    lintOnSave: process.env.NODE_ENV !== 'production',
+    lintOnSave: false,
     productionSourceMap: process.env.NODE_ENV !== 'production',
     devServer: {
+        disableHostCheck: true,
         port: 8087
     },
 }

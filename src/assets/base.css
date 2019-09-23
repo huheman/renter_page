@@ -1,0 +1,13 @@
+.buttonDiv {
+    text-align :right;
+    margin: 12px auto;
+}
+
+.buttonDiv > .buttionGroup {
+    margin : 0px auto;
+    margin-right: 40px;
+}
+
+.baseTable > .table{
+    margin: 0px  30px;
+}
