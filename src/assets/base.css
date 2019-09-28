@@ -1,11 +1,16 @@
+.baseDiv{
+  text-align :center;
+}
 .buttonDiv {
-    text-align :right;
     margin: 12px auto;
+    /* 用于解决子元素float以后父元素无法撑开的问题 */
+    overflow: hidden;  
 }
 
-.buttonDiv > .buttionGroup {
+.buttionGroup {
     margin : 0px auto;
     margin-right: 40px;
+    float: right;
 }
 
 .baseTable > .table{

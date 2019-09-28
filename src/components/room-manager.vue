@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="baseDiv">
     <div class="baseTable">
       <Tabs class="table" v-model="currentPane">
         <TabPane name="total" label="全部房间">
@@ -11,7 +11,7 @@
           :key="roomGroup.id"
           :label="roomGroup.groupName"
         >
-          <RoomTable :ref='"group"+roomGroup.id' :roomGroupIdList="roomGroup.id" @toModify="modifyRoom"></RoomTable>
+          <RoomTable :ref='"group"+roomGroup.id' :roomGroupIdList="[roomGroup.id]" @toModify="modifyRoom"></RoomTable>
         </TabPane>
         <ButtonGroup slot="extra" shape="circle">
           <Button icon="md-add" type="primary" @click="createRoom">创建房间</Button>
@@ -73,26 +73,46 @@ import _axios from '@/plugins/axios';
   }
 })
 export default class App extends Vue {
-  private currentPane: string = "total"; // 当前激活组件
+  private currentPane:any = 'total'; // 当前激活组件，默认是total
   private allGroups = []; // 所有组别
-  private allRenter = []; // 所有住户
   private modalShow = false; // 模态框是否显示
   private modalTitle = ""; // 模态框的提示
   private modalLoading = true; // 点击确定后模态框是否消失
-  private roomInModal = { roomGroupIdList: [] }; // 模态框中的房间信息
+  private roomInModal :any={}; // 模态框中的房间信息
   mounted() {
     // 获取所有房间组别
-    this.fetchAllRoomGroup();
-    // 刷新当前组别表格
-    this.reflashCurrentTable();
+    this.fetchAllRoomGroup(()=>{
+      let urlPaneName = this.$route.query.currentPane
+      if(urlPaneName){
+        this.currentPane = urlPaneName
+      }else{
+        // 刷新当前组别表格
+        this.reflashCurrentTable();
+      }
+    });
+  }
+  /**通过当前激活页面拿到激活的roomTable */
+  get currentRoomTable():any{
+    let target
+    console.log('outside = '+ this.$refs[this.currentPane])
+    if (this.currentPane == "total") {
+      target = this.$refs[this.currentPane];
+    } else {
+      console.log(this.$refs[this.currentPane])
+      target = this.$refs[this.currentPane][0];
+    }
+    return target
   }
 
   /**获取所有房间组别信息 */
-  private fetchAllRoomGroup() {
+  private fetchAllRoomGroup(fun:any) {
     axios.get("/api/roommodel/roomgroup").then(resp => {
       this.allGroups = resp.data.data;
       if (!this.allGroups) {
-        this.allGroups = [];
+        this.allGroups = []
+      }
+      if(fun){
+        this.$nextTick(fun)
       }
     });
   }
@@ -101,30 +121,25 @@ export default class App extends Vue {
   @Watch("currentPane")
   private handleTabsClicked(to, from) {
     // 一旦改变了就刷新当前标签
+    console.log('to = '+to+",from = "+from)
     this.reflashCurrentTable();
   }
 
   /**刷新当前标签的表格 */
   private reflashCurrentTable() {
-    let target;
-    if (this.currentPane == "total") {
-      target = this.$refs[this.currentPane];
-    } else {
-      target = this.$refs[this.currentPane][0];
-    }
-    target.getRoomMsgByPage();
+    this.currentRoomTable.getRoomMsgByPage();
   }
 
   /**新建房间，要初始化模态框 */
   private createRoom() {
     this.modalTitle = "新建房间";
-    this.roomInModal = { roomGroupIdList: [] };
+    this.roomInModal={roomGroupIdList:this.currentRoomTable.roomGroupIdList}
     this.modalShow = true;
   }
 
   private modifyRoom(room) {
     this.modalTitle = "修改房间信息";
-    this.roomInModal = room
+    this.roomInModal = JSON.parse(JSON.stringify(room))
     // 获取房间对应的楼层信息
     _axios.get("/api/roommodel/room/getRoomGroupId",{params:{
       roomId: room.id

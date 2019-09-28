@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="baseDiv">
     <div class='buttonDiv'>
         <ButtonGroup class='buttionGroup'>
             <Button icon='md-add' type="primary" @click='createGroup'>创建组别</Button>
@@ -15,9 +15,9 @@
             </template>
             <template slot-scope="{row,index}" slot="name">
                 <Tooltip  v-if="row.groupDesc" trigger="hover"  :content="row.groupDesc" placement="top-start">
-                    <a @click.prevent='toRoomPage(index)'>{{row.groupName}}</a>
-                </Tooltip >
-                 <a v-else @click.prevent='toRoomPage(index)'>{{row.groupName}}</a>
+                    <a @click.prevent='toRoomPage(row)'>{{row.groupName}}</a>
+                </Tooltip>
+                 <a v-else @click.prevent='toRoomPage(row)'>{{row.groupName}}</a>
             </template>
             <template slot-scope="{row,index}" slot='action'>
                 <a type="text"  @click.prevent='toModify(index)'><Icon type="md-build" /> 修改</a>
@@ -74,6 +74,11 @@ import axios from '@/plugins/axios';
 @Component
 export default class RoomGroup extends Vue {
   private column = [
+      {
+          title: '#',
+          type: 'index',
+          width: '50'
+      },
     {
       title: "组别名称",
       slot: 'name'
@@ -88,7 +93,8 @@ export default class RoomGroup extends Vue {
     },
     {
       title: "操作",
-      slot: 'action'
+      slot: 'action',
+      width: '160'
     }
   ];
   private groupTypes = [
@@ -138,8 +144,10 @@ export default class RoomGroup extends Vue {
   }
 
   // 点击了某个房间
-  private toRoomPage(index:number){
-      alert(index)
+  private toRoomPage(row){
+      let path = "/room"
+      let query = {currentPane : 'group'+row.id}
+      this.$router.push({path:path,query:query})
   }
 
   // 点击了删除链接
