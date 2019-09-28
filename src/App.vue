@@ -6,6 +6,7 @@
 
 <script>
 import {Component,Vue} from 'vue-property-decorator'
+import '@/assets/base.css';
 @Component({components:{
 }})
 export default class App extends Vue {}

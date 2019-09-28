@@ -35,13 +35,13 @@ _axios.interceptors.response.use(
     switch(response.data.resultFlag){
       case 0:
         iView.Message.error("服务器出错！")
-        return Promise.reject()
+        break;
       case 10000:
         iView.Message.info("执行错误："+response.data.msg)
-        return response;
+        break;
       case 30000:
         iView.Message.info("未找到数据！")
-        return response;
+        break;
     }
     return response;
   },

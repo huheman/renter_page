@@ -30,6 +30,7 @@
         v-model="modalShow"
         :title="modalTitle"
         :loading="modalLoading"
+        width="535"
         @on-ok="postGroup">
         <Form :model="groupInModal" :label-width="80" >
             <Row :gutter='8'>
@@ -49,13 +50,15 @@
             <FormItem label="组别介绍" >
                 <Input type="textarea" :autosize="{minRows: 2,maxRows: 5}" v-model="groupInModal.groupDesc" placeholder="请输入组的描述"></Input>
             </FormItem>
-            <Transfer
-                :titles = 'titles'
-                :data="transferTotalData"
-                :target-keys="groupInModal.roomIdList"
-                filterable
-                @on-change="handleTransferChange">
-            </Transfer>
+            <FormItem label="选择房间" >
+                <Transfer
+                    :titles = 'titles'
+                    :data="transferTotalData"
+                    :target-keys="groupInModal.roomIdList"
+                    filterable
+                    @on-change="handleTransferChange">
+                </Transfer>
+            </FormItem>
         </Form>
     </Modal>
   </div>
@@ -64,7 +67,6 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import {Table} from 'iview';
-import '@/assets/base.css';
 import axios from '@/plugins/axios';
 
 
@@ -104,24 +106,7 @@ export default class RoomGroup extends Vue {
       },
   ];
   private tableData = [];
-  private transferTotalData=[
-      {
-          key: 1,
-          label: '204'
-      },
-      {
-          key:2,
-          label:'205'
-      },
-      {
-          key:3,
-          label:'206'
-      },
-      {
-          key:4,
-          label:'207'
-      }
-  ];
+  private transferTotalData=[];
   private modalTitle=''
   private groupInModal:any={roomIdList:[],groupType:0}
   private modalShow:boolean = false
@@ -129,14 +114,27 @@ export default class RoomGroup extends Vue {
   private modalLoading=true
   // 创建时期
   created(){
-      this.initModal()
       this.getAllRoomGroups()
+      this.getAllRooms();
   }
+  // 获取所有房间
+  private getAllRooms(){
+      axios.get("/api/roommodel/room/listAll").then(resp => {
+          this.transferTotalData = []
+          for(let one of resp.data.data){
+              let toPush ={key:'',label:''}
+              toPush.key = one.id
+              toPush.label = one.roomName
+              this.transferTotalData.push(toPush)
+          }        
+      })
+  }
+
   // 点击了修改连接
   private toModify(index:number){
       this.modalTitle= '修改组别'
       this.modalShow = true
-      this.groupInModal = this.tableData[index]
+      this.groupInModal = JSON.parse(JSON.stringify(this.tableData[index]))
   }
 
   // 点击了某个房间
@@ -151,7 +149,7 @@ export default class RoomGroup extends Vue {
           onOk: () => {
             axios({
                 method: 'delete',
-                url:'/roomgroup',
+                url:'/api/roommodel/roomgroup',
                 params:{
                     id: this.tableData[index].id
                 }
@@ -171,18 +169,18 @@ export default class RoomGroup extends Vue {
 
   // 把模态框里的数据投到服务器 
   private postGroup(){
-      axios.post("/roomgroup",this.groupInModal).then(resp =>{
-          if(resp.data.resultFlag == 20000){
-              this.$Message.success("保存成功")
-              this.getAllRoomGroups()
-              this.modalShow = false
-          }else{
-              this.modalLoading = false
-          }
+      axios.post("/api/roommodel/roomgroup",this.groupInModal).then(resp =>{
           // 用nextTick可以异步把modalLoading变成可loading的
+          this.modalLoading = false
           this.$nextTick(() =>{
             this.modalLoading= true
-           })
+            })
+          if(resp.data.resultFlag == 20000){
+              this.$Message.success("保存房间组别成功")
+              this.getAllRoomGroups()
+              this.modalShow = false
+          }
+          
       })
       
   }
@@ -197,8 +195,8 @@ export default class RoomGroup extends Vue {
   }
   // 获得所有房间组别的数据
   private getAllRoomGroups(){
-     axios.get("/roomgroup").then((resp)=>{
-         this.tableData = resp.data.data.list
+     axios.get("/api/roommodel/roomgroup").then((resp)=>{
+         this.tableData = resp.data.data
          if(!this.tableData){
              this.tableData = []
          }
