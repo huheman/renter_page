@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import RoomGroup from '@/components/room-group-manager.vue'
 import Room from '@/components/room-manager.vue'
+import Renter from '@/components/renter-manager.vue'
+import ChargeTemplate from '@/components/charge-template-manager.vue'
 
 Vue.use(Router)
 
@@ -34,9 +36,20 @@ export default new Router({
       component: Room
     },
     {
+      path: '/renter',
+      name: 'renter',
+      component: Renter
+    },
+    {
+      path: '/chargeTemplate',
+      name: 'chargeTemplate',
+      component: ChargeTemplate
+    },
+    {
       path: '/test',
       name: 'test',
       component: () => import('@/components/test.vue')
     }
+    
   ]
 })

@@ -8,25 +8,46 @@
         <p style="cursor:default" v-else>{{row.roomName}}</p>
       </template>
       <template slot-scope='{row}' slot='status'>
-          <Tag v-if="row.roomStatus == 1" color="green">租用中</Tag>
-          <Tag v-if="row.roomStatus == 0" color="red">空置中</Tag>
+        <Poptip transfer v-if="row.renterList.length > 0"  trigger="hover" title="住户信息：">
+            <div slot='content' style="position: relative;overflow: hidden;">
+            <p v-for="renter in row.renterList" :key="renter.id" style="text-align:center">
+                {{renter.name + '  ， '+ renter.age}}岁{{' ， '+(renter.gender?'男':'女')}}
+            </p>
+            </div>
+            <Tag  color="green">租用中</Tag>
+        </Poptip>
+          <Tag v-else color="red">空置中</Tag>
+      </template>
+      <template slot-scope='{row}' slot='chargeTemplate'>
+          <ChargeTemplateTab :chargeTemplateIdList='row.chargeTemplateIdList' :totalTemplate='totalTemplate'></ChargeTemplateTab>
       </template>
       <template slot='action' slot-scope="{row,index}">
-          <a @click.prevent='$emit("toModify",row)'><Icon type="md-build" /> 修改</a>
+          <a @click.prevent='$emit("toModify",row)'><Icon type="md-build" /> 设置</a>
           <Divider type='vertical'></Divider>
           <a @click.prevent='toDelete(index)'><Icon type="md-close" />删除</a>
+      </template>
+      <template slot="roomManage" slot-scope="{row,index}">
+          <div v-if="row.renterList.length > 0">
+          <Button  type='default' @click="moveOut(row)">退房</Button>
+          </div>
+          <Button v-else type='info'  @click="moveIn(row)">入住</Button>
       </template>
   </Table>
   <Page style="margin: 10px auto" :total="total" show-total show-sizer @on-change='handlePageChange' @on-page-size-change='handlePageSizeChange'></Page>
     </div>
+    
 </template>
 <script lang='ts'>
-import {Component,Vue, Prop, Watch} from 'vue-property-decorator'
+import {Component,Vue, Prop, Watch,Emit} from 'vue-property-decorator'
 import _axios from '../plugins/axios';
+import ChargeTemplateTab from "@/components/charge-template-tab.vue";
+
 @Component({components:{
+    ChargeTemplateTab
 }})
 export default class App extends Vue {
     @Prop() private roomGroupIdList:[Number]
+    @Prop() private totalTemplate:[any]
     private conditionToPost:any = {};
     private columns = [
         {
@@ -47,13 +68,19 @@ export default class App extends Vue {
         },
         {
             title: '费用模板',
+            slot: 'chargeTemplate'
         },
         {
-            title: '操作',
+            title: '房间管理',
+            slot: 'roomManage'
+        },
+        {
+            title: '其他',
             slot: 'action',
             width: '160'
         }
     ]
+    private spinShow =true // 是否显示loading
     private data = []
     private total = 0
     public getRoomMsgByPage(){
@@ -61,7 +88,7 @@ export default class App extends Vue {
         if(this.roomGroupIdList)
             this.conditionToPost.roomGroupIdList = this.roomGroupIdList.join(',')
         // 把查询对象传给后台，获取对应的房间列表
-        _axios.get("/api/roommodel/room",{params:this.conditionToPost}).then(resp => {
+        _axios.get("/roommodel/room",{params:this.conditionToPost}).then(resp => {
             this.data = resp.data.data.list
             this.total = resp.data.data.totalCount
         })
@@ -76,15 +103,13 @@ export default class App extends Vue {
         this.getRoomMsgByPage();
     }
 
-
-
     private toDelete(index:number){
         this.$Modal.confirm({
           content: '是否真的要删除房间：'+this.data[index].roomName,
           onOk: () => {
             _axios({
                 method: 'delete',
-                url:'/api/roommodel/room',
+                url:'/roommodel/room',
                 params:{
                     roomId: this.data[index].id
                 }
@@ -94,7 +119,18 @@ export default class App extends Vue {
           },
       })
     }
+
     mounted(){
+    }
+
+    // 入住房间
+    @Emit("moveIn") private moveIn(row){
+        return row
+    }
+
+    // 退房
+    @Emit("moveOut") private moveOut(row){
+        return row
     }
 }
 </script>

@@ -1,6 +1,5 @@
 "use strict";
 
-import Vue from 'vue';
 import axios from "axios";
 import iView from 'iview'
 
@@ -10,7 +9,7 @@ import iView from 'iview'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 let config = {
-  // baseURL: process.env.baseURL || process.env.apiUrl || ""
+  baseURL: "/api"
   // timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };
@@ -37,10 +36,28 @@ _axios.interceptors.response.use(
         iView.Message.error("服务器出错！")
         break;
       case 10000:
-        iView.Message.info("执行错误："+response.data.msg)
+        if (response.data.msg){
+          let msg = response.data.msg
+          if(msg.search('important:')>-1){
+            msg = msg.substring(15)
+            iView.Modal.warning({
+              title: '警告',
+              content: msg
+            });
+          }else{
+            iView.Message.info(response.data.msg)
+          }
+          
+        }
         break;
       case 30000:
-        iView.Message.info("未找到数据！")
+        let msg= '未找到数据'
+        if(response.data.msg!=undefined){
+          msg = response.data.msg
+        }
+        if(msg){
+          iView.Message.info(msg)
+        }
         break;
     }
     return response;

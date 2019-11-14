@@ -3,102 +3,107 @@
     <div class="baseTable">
       <Tabs class="table" v-model="currentPane">
         <TabPane name="total" label="全部房间">
-          <RoomTable ref="total"  @toModify="modifyRoom"></RoomTable>
+          <RoomTable ref="total" :totalTemplate='totalTemplate'  @toModify="modifyRoom" @moveIn='moveIn' @moveOut='moveOut'></RoomTable>
         </TabPane>
         <TabPane
           :name='"group"+roomGroup.id'
           v-for="roomGroup in allGroups"
           :key="roomGroup.id"
-          :label="roomGroup.groupName"
-        >
-          <RoomTable :ref='"group"+roomGroup.id' :roomGroupIdList="[roomGroup.id]" @toModify="modifyRoom"></RoomTable>
+          :label="roomGroup.groupName">
+          <RoomTable :ref='"group"+roomGroup.id' :totalTemplate='totalTemplate' :roomGroupIdList="[roomGroup.id]" @toModify="modifyRoom"  @moveIn='moveIn' @moveOut='moveOut'></RoomTable>
         </TabPane>
         <ButtonGroup slot="extra" shape="circle">
           <Button icon="md-add" type="primary" @click="createRoom">创建房间</Button>
-          <Button icon="ios-albums-outline" @click="createNote">创建备注</Button>
+          <Button icon="ios-albums" @click="createNote">创建备注</Button>
+          <Button icon="md-bookmarks" @click="toGroup()">所有组别</Button>
         </ButtonGroup>
       </Tabs>
     </div>
-
+    <!-- 房间读数编辑模态框 -->
+    <DegreeModal ref="degreeModal" :totalTemplate='totalTemplate'></DegreeModal>
     <!--房间信息编辑模态框-->
-    <Modal
-      v-model="modalShow"
-      :title="modalTitle"
-      :loading="modalLoading"
-      width="535"
-      @on-ok="postRoom"
-    >
-      <Form :model="roomInModal" :label-width="80">
-        <FormItem label="房间名称" required>
-          <Input v-model="roomInModal.roomName" placeholder="请输入房间名称"></Input>
-        </FormItem>
-        <FormItem label="房间描述">
-          <Input
-            type="textarea"
-            :autosize="{minRows: 2,maxRows: 5}"
-            v-model="roomInModal.roomDesc"
-            placeholder="请输入房间的介绍"
-          ></Input>
-        </FormItem>
-        <FormItem label="所在组别">
-          <Select v-model="roomInModal.roomGroupIdList" filterable multiple>
-            <Option v-for="item in allGroups" :value="item.id" :key="item.id">{{ item.groupName }}</Option>
-          </Select>
-        </FormItem>
-        <!--
-            <FormItem label="住户">
-              <Select v-model="roomInModal.renter.id" filterable>
-                <Option v-for="item in cityList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-              </Select>
-            </FormItem>
-            <FormItem label="费用模板" >
-                <Transfer>
-                    
-                </Transfer>
-            </FormItem>
-        -->
-      </Form>
-    </Modal>
+    <RoomPropertiesModal ref="roomPropertiesModal" :allGroups='allGroups' :renterList='renterList' @onPostRoom='reflashCurrentTable'></RoomPropertiesModal>
+    <!-- 入住表格模态框 -->
+    <MoveInModal ref="moveInModal"  :renterList='renterList' @newRenter='newRenter' @hasMoveIn='reflashCurrentTable();fetchAllRenterList()' @modifyDegrees='showModifyDegreeModal' ></MoveInModal>
+    <!-- 新建租户模态框 -->
+    <RenterModal ref='renterModal' @onPostSuccess='onNewRenterPostSuccess'></RenterModal>
   </div>
 </template>
 
 <script lang='ts'>
-import { Component, Vue, Watch } from "vue-property-decorator";
-import axios from "@/plugins/axios";
-import RoomTable from "@/components/page-room-table.vue";
-import _axios from '@/plugins/axios';
+import { Component, Vue, Watch } from "vue-property-decorator"
+import axios from "@/plugins/axios"
+import RoomTable from "@/components/page-room-table.vue"
+import _axios from '@/plugins/axios'
+import {toGroup} from '@/assets/api'
+import RenterModal from "@/components/renter-modal.vue"
+import RoomPropertiesModal from '@/components/room-properties-modal.vue'
+import MoveInModal from '@/components/move-in-modal.vue'
+import DegreeModal from '@/components/degree-modify-modal.vue'
 @Component({
   components: {
-    RoomTable
+    RoomTable,
+    RenterModal,
+    RoomPropertiesModal,
+    MoveInModal,
+    DegreeModal
   }
 })
 export default class App extends Vue {
   private currentPane:any = 'total'; // 当前激活组件，默认是total
   private allGroups = []; // 所有组别
-  private modalShow = false; // 模态框是否显示
-  private modalTitle = ""; // 模态框的提示
-  private modalLoading = true; // 点击确定后模态框是否消失
-  private roomInModal :any={}; // 模态框中的房间信息
+  private renterList = [];
+  private totalTemplate=[];
+  /**获取renterModal */
+  get renterModal(){
+        let target:any = this.$refs.renterModal
+        return target
+    }
+
+  get degreeModal(){
+    let target:any = this.$refs.degreeModal
+    return target
+  }
+
+  get roomPropertiesModal(){
+    let target:any = this.$refs.roomPropertiesModal
+    return target
+  }
+
+  get moveInModal(){
+    let target:any = this.$refs.moveInModal
+    return target
+  }
   mounted() {
     // 获取所有房间组别
     this.fetchAllRoomGroup(()=>{
       let urlPaneName = this.$route.query.currentPane
       if(urlPaneName){
+        // 如果url有值，则改变urlpaneName就好，会自动调用watch信息
         this.currentPane = urlPaneName
       }else{
-        // 刷新当前组别表格
+        // 刷新当前组别表格，
         this.reflashCurrentTable();
       }
     });
+    this.fetchAllRenterList()
+    this.fetchAllChargeTemplate()
   }
+
+  private fetchAllChargeTemplate(){
+    axios.get("/chargemodel/chargeTemplate/listAll").then(resp=>{
+      this.totalTemplate = resp.data.data
+      this.roomPropertiesModal.setUpChargeTemplateInTransfer(this.totalTemplate)
+    })
+  }
+
+  
   /**通过当前激活页面拿到激活的roomTable */
   get currentRoomTable():any{
     let target
-    console.log('outside = '+ this.$refs[this.currentPane])
     if (this.currentPane == "total") {
       target = this.$refs[this.currentPane];
     } else {
-      console.log(this.$refs[this.currentPane])
       target = this.$refs[this.currentPane][0];
     }
     return target
@@ -106,7 +111,7 @@ export default class App extends Vue {
 
   /**获取所有房间组别信息 */
   private fetchAllRoomGroup(fun:any) {
-    axios.get("/api/roommodel/roomgroup").then(resp => {
+    axios.get("/roommodel/roomgroup").then(resp => {
       this.allGroups = resp.data.data;
       if (!this.allGroups) {
         this.allGroups = []
@@ -117,11 +122,22 @@ export default class App extends Vue {
     });
   }
 
+  private toGroup = toGroup
+
+  /** 创建房间 */
+  private createRoom(){
+    this.roomPropertiesModal.createRoom(this.currentRoomTable.roomGroupIdList)
+  }
+
+  /** 修改房间 */
+  private modifyRoom(room){
+    this.roomPropertiesModal.modifyRoom(room)
+  }
+
   /**监控当前标签改变 */
   @Watch("currentPane")
   private handleTabsClicked(to, from) {
     // 一旦改变了就刷新当前标签
-    console.log('to = '+to+",from = "+from)
     this.reflashCurrentTable();
   }
 
@@ -130,42 +146,41 @@ export default class App extends Vue {
     this.currentRoomTable.getRoomMsgByPage();
   }
 
-  /**新建房间，要初始化模态框 */
-  private createRoom() {
-    this.modalTitle = "新建房间";
-    this.roomInModal={roomGroupIdList:this.currentRoomTable.roomGroupIdList}
-    this.modalShow = true;
+  /** 打开住户模态框，创建新住户 */
+  private newRenter(){
+    this.renterModal.init()
   }
+  
 
-  private modifyRoom(room) {
-    this.modalTitle = "修改房间信息";
-    this.roomInModal = JSON.parse(JSON.stringify(room))
-    // 获取房间对应的楼层信息
-    _axios.get("/api/roommodel/room/getRoomGroupId",{params:{
-      roomId: room.id
-    }}).then(resp => {
-      this.roomInModal.roomGroupIdList = resp.data.data
-      this.modalShow = true
-    })
-    
-  }
-
-  private createNote() {}
-
-  /**把房间的改动传给服务器 */
-  private postRoom() {
-    axios.post("/api/roommodel/room", this.roomInModal).then(resp => {
-      // 先把loading停了先
-      this.modalLoading = false;
-      this.$nextTick(() => {
-        this.modalLoading = true;
-      });
-      if (resp.data.resultFlag == 20000) {
-        this.$Message.success("保存房间成功");
-        this.reflashCurrentTable();
-        this.modalShow = false;
+  /**获取所有租户的信息 */
+  private fetchAllRenterList(){
+    _axios.get("/rentermodel/renter/listAll").then(resp=>{
+      this.renterList = resp.data.data
+      if(!this.renterList){
+        this.renterList = []
       }
-    });
+    })
+  }
+
+  /** 新建备忘 */
+  private createNote() {
+  }
+
+  /**当新增住户完成 */
+  private onNewRenterPostSuccess(){
+    this.fetchAllRenterList()
+  }
+
+  private moveIn(roomToMoveIn){
+    this.moveInModal.setRoomToMoveIn(roomToMoveIn)
+  }
+
+  private showModifyDegreeModal(roomToModify){
+    this.degreeModal.setRoomToModify(roomToModify)
+  }
+
+  private moveOut(roomToMoveOut){
+
   }
 }
 </script>

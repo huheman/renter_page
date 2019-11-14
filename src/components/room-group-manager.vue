@@ -2,7 +2,8 @@
   <div class="baseDiv">
     <div class='buttonDiv'>
         <ButtonGroup class='buttionGroup'>
-            <Button icon='md-add' type="primary" @click='createGroup'>创建组别</Button>
+            <Button icon='md-add' type="primary" @click='createGroup' shape='circle'>创建组别</Button>
+            <Button icon='ios-apps' @click='toRoomPage()' shape='circle'>所有房间</Button>
         </ButtonGroup>
     </div>
     <div class='baseTable'>
@@ -15,9 +16,9 @@
             </template>
             <template slot-scope="{row,index}" slot="name">
                 <Tooltip  v-if="row.groupDesc" trigger="hover"  :content="row.groupDesc" placement="top-start">
-                    <a @click.prevent='toRoomPage(row)'>{{row.groupName}}</a>
+                    <a @click.prevent='toRoomPage(row.id)'>{{row.groupName}}</a>
                 </Tooltip>
-                 <a v-else @click.prevent='toRoomPage(row)'>{{row.groupName}}</a>
+                 <a v-else @click.prevent='toRoomPage(row.id)'>{{row.groupName}}</a>
             </template>
             <template slot-scope="{row,index}" slot='action'>
                 <a type="text"  @click.prevent='toModify(index)'><Icon type="md-build" /> 修改</a>
@@ -68,7 +69,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import {Table} from 'iview';
 import axios from '@/plugins/axios';
-
+import {toRoomPage} from '@/assets/api'
 
 
 @Component
@@ -125,7 +126,7 @@ export default class RoomGroup extends Vue {
   }
   // 获取所有房间
   private getAllRooms(){
-      axios.get("/api/roommodel/room/listAll").then(resp => {
+      axios.get("/roommodel/room/listAll").then(resp => {
           this.transferTotalData = []
           for(let one of resp.data.data){
               let toPush ={key:'',label:''}
@@ -135,19 +136,12 @@ export default class RoomGroup extends Vue {
           }        
       })
   }
-
+  private toRoomPage = toRoomPage
   // 点击了修改连接
   private toModify(index:number){
       this.modalTitle= '修改组别'
       this.modalShow = true
       this.groupInModal = JSON.parse(JSON.stringify(this.tableData[index]))
-  }
-
-  // 点击了某个房间
-  private toRoomPage(row){
-      let path = "/room"
-      let query = {currentPane : 'group'+row.id}
-      this.$router.push({path:path,query:query})
   }
 
   // 点击了删除链接
@@ -157,7 +151,7 @@ export default class RoomGroup extends Vue {
           onOk: () => {
             axios({
                 method: 'delete',
-                url:'/api/roommodel/roomgroup',
+                url:'/roommodel/roomgroup',
                 params:{
                     id: this.tableData[index].id
                 }
@@ -165,7 +159,6 @@ export default class RoomGroup extends Vue {
                 this.getAllRoomGroups()
             })
           },
-          
       })
   }
 
@@ -177,7 +170,7 @@ export default class RoomGroup extends Vue {
 
   // 把模态框里的数据投到服务器 
   private postGroup(){
-      axios.post("/api/roommodel/roomgroup",this.groupInModal).then(resp =>{
+      axios.post("/roommodel/roomgroup",this.groupInModal).then(resp =>{
           // 用nextTick可以异步把modalLoading变成可loading的
           this.modalLoading = false
           this.$nextTick(() =>{
@@ -203,7 +196,7 @@ export default class RoomGroup extends Vue {
   }
   // 获得所有房间组别的数据
   private getAllRoomGroups(){
-     axios.get("/api/roommodel/roomgroup").then((resp)=>{
+     axios.get("/roommodel/roomgroup").then((resp)=>{
          this.tableData = resp.data.data
          if(!this.tableData){
              this.tableData = []
