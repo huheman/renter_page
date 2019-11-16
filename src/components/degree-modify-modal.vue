@@ -43,14 +43,19 @@ import ChargeTemplateTab from '@/components/charge-template-tab.vue'
 export default class App extends Vue {
     @Prop() private totalTemplate!:Array<any>
     private roomToModify:any={}
-    private objToPost:any = {}
+    private roomDegrees:any = {}
     private modalShow = false
     private modalLoading = true
     private modalTitle = '修改房间收费读数'
 
     public setRoomToModify(roomToModify){
         this.roomToModify = roomToModify
-        this.objToPost = {roomId:this.roomToModify.id,degrees:[]}
+        
+        // 获取此房间现在的度数
+        this.$axios.get("/chargemodel/chargeTemplate/queryRoomDegrees",{params:{roomId: roomToModify.id}})
+        .then(resp => {
+          this.roomDegrees = resp.data
+        })
         this.modalShow = true
     }
 

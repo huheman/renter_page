@@ -6,7 +6,9 @@ import router from './router'
 import store from './store'
 import moment from 'moment'
 import * as filters from './assets/filter'
+import { AxiosInstance } from "axios"; 
 
+declare module "vue/types/vue" { interface Vue { $axios: AxiosInstance } }
 Object.keys(filters).forEach(key => {
   Vue.filter(key, filters[key])
 })

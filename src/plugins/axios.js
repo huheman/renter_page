@@ -69,5 +69,24 @@ _axios.interceptors.response.use(
   }
 );
 
+// 把axios注册到Vue中。在其他地方可以直接this.$axios使用
+Plugin.install = function(Vue, options) {
+  Vue.axios = _axios;
+  window.axios = _axios;
+  Object.defineProperties(Vue.prototype, {
+    axios: {
+      get() {
+        return _axios;
+      }
+    },
+    $axios: {
+      get() {
+        return _axios;
+      }
+    },
+  });
+};
 
-export default _axios;
+Vue.use(Plugin)
+
+export default Plugin;
