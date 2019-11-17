@@ -1,3 +1,4 @@
+import moment from 'moment'
 /**前往所有组别的页面 */
 export function toGroup(){
    this.$router.push({path:"/room-group"})
@@ -57,3 +58,7 @@ export function formattedMoney(val){
         return val.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     }
 }
+
+export function formateDate(date){
+    return moment(date).format("YYYY-MM-DD")
+  }

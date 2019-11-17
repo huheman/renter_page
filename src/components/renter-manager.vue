@@ -87,7 +87,7 @@ export default class App extends Vue {
     }
 
     private getRenterByPage(){
-        axios.get("/rentermodel/renter",{params:this.conditionToPost}).then(resp => {
+        this.$axios.get("/rentermodel/renter",{params:this.conditionToPost}).then(resp => {
             this.data = resp.data.data.list
             this.total = resp.data.data.totalCount
         })

@@ -3,7 +3,7 @@
     <div class="baseTable">
       <Tabs class="table" v-model="currentPane">
         <TabPane name="total" label="全部房间">
-          <RoomTable ref="total" :totalTemplate='totalTemplate'  @toModify="modifyRoom" @moveIn='moveIn' @moveOut='moveOut'></RoomTable>
+          <RoomTable ref="total" :totalTemplate='totalTemplate'  @toModifyRoomInfo="modifyRoom" @moveIn='moveIn' @moveOut='moveOut' @toModifyBillInfo="showModifyDegreeModal"></RoomTable>
         </TabPane>
         <TabPane
           :name='"group"+roomGroup.id'
@@ -91,7 +91,7 @@ export default class App extends Vue {
   }
 
   private fetchAllChargeTemplate(){
-    axios.get("/chargemodel/chargeTemplate/listAll").then(resp=>{
+    this.$axios.get("/chargemodel/chargeTemplate/listAll").then(resp=>{
       this.totalTemplate = resp.data.data
       this.roomPropertiesModal.setUpChargeTemplateInTransfer(this.totalTemplate)
     })
@@ -111,7 +111,7 @@ export default class App extends Vue {
 
   /**获取所有房间组别信息 */
   private fetchAllRoomGroup(fun:any) {
-    axios.get("/roommodel/roomgroup").then(resp => {
+    this.$axios.get("/roommodel/roomgroup").then(resp => {
       this.allGroups = resp.data.data;
       if (!this.allGroups) {
         this.allGroups = []
@@ -154,7 +154,7 @@ export default class App extends Vue {
 
   /**获取所有租户的信息 */
   private fetchAllRenterList(){
-    _axios.get("/rentermodel/renter/listAll").then(resp=>{
+    this.$axios.get("/rentermodel/renter/listAll").then(resp=>{
       this.renterList = resp.data.data
       if(!this.renterList){
         this.renterList = []

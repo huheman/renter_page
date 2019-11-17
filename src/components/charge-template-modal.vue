@@ -73,7 +73,7 @@ export default class App extends Vue {
     private objInModal:any ={}
 
     private postChargeTemplate(){
-      axios.post("/chargemodel/chargeTemplate",this.objInModal).then(resp => {
+      this.$axios.post("/chargemodel/chargeTemplate",this.objInModal).then(resp => {
         this.modalLoading = false;
         this.$nextTick(()=>{
           this.modalLoading = true;

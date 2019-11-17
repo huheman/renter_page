@@ -126,7 +126,7 @@ export default class App extends Vue {
     }
 
     private getchargeTemplateByPage(){
-        axios.get("/chargemodel/chargeTemplate",{params:this.conditionToPost}).then(resp => {
+        this.$axios.get("/chargemodel/chargeTemplate",{params:this.conditionToPost}).then(resp => {
             this.data = resp.data.data.list
             this.total = resp.data.data.totalCount
         })
@@ -134,7 +134,7 @@ export default class App extends Vue {
 
     private findRenterList(roomId){
         this.spinShow =true
-        axios.get("/rentermodel/renter/baseRenterDTO/"+roomId).then(resp => {
+        this.$axios.get("/rentermodel/renter/baseRenterDTO/"+roomId).then(resp => {
             this.currentRenterList = resp.data.data
             this.spinShow = false
         })

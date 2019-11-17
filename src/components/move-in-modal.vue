@@ -104,7 +104,7 @@ export default class App extends Vue {
     if (this.moveOutDate){
       this.objToPost.expectMoveOutDate = moment(this.moveOutDate).format('YYYY-MM-DD')
     }
-    axios.post("/roommodel/room/moveIn",this.objToPost).then(resp => {
+    this.$axios.post("/roommodel/room/moveIn",this.objToPost).then(resp => {
       this.modalLoading=false
       this.$nextTick(() =>{
         this.modalLoading = true

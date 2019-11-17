@@ -22,7 +22,9 @@
           <ChargeTemplateTab :chargeTemplateIdList='row.chargeTemplateIdList' :totalTemplate='totalTemplate'></ChargeTemplateTab>
       </template>
       <template slot='action' slot-scope="{row,index}">
-          <a @click.prevent='$emit("toModify",row)'><Icon type="md-build" /> 设置</a>
+          <a @click.prevent='$emit("toModifyRoomInfo",row)'><Icon type="md-build" /> 设置房间信息</a>
+          <Divider type='vertical'></Divider>
+          <a @click.prevent='$emit("toModifyBillInfo",row)'><Icon type="logo-usd" /> 设置费用信息</a>
           <Divider type='vertical'></Divider>
           <a @click.prevent='toDelete(index)'><Icon type="md-close" />删除</a>
       </template>
@@ -39,7 +41,6 @@
 </template>
 <script lang='ts'>
 import {Component,Vue, Prop, Watch,Emit} from 'vue-property-decorator'
-import _axios from '../plugins/axios';
 import ChargeTemplateTab from "@/components/charge-template-tab.vue";
 
 @Component({components:{
@@ -77,7 +78,6 @@ export default class App extends Vue {
         {
             title: '其他',
             slot: 'action',
-            width: '160'
         }
     ]
     private spinShow =true // 是否显示loading
@@ -88,7 +88,7 @@ export default class App extends Vue {
         if(this.roomGroupIdList)
             this.conditionToPost.roomGroupIdList = this.roomGroupIdList.join(',')
         // 把查询对象传给后台，获取对应的房间列表
-        _axios.get("/roommodel/room",{params:this.conditionToPost}).then(resp => {
+        this.$axios.get("/roommodel/room",{params:this.conditionToPost}).then(resp => {
             this.data = resp.data.data.list
             this.total = resp.data.data.totalCount
         })
@@ -107,7 +107,7 @@ export default class App extends Vue {
         this.$Modal.confirm({
           content: '是否真的要删除房间：'+this.data[index].roomName,
           onOk: () => {
-            _axios({
+            this.$axios({
                 method: 'delete',
                 url:'/roommodel/room',
                 params:{

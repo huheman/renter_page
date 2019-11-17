@@ -126,7 +126,7 @@ export default class RoomGroup extends Vue {
   }
   // 获取所有房间
   private getAllRooms(){
-      axios.get("/roommodel/room/listAll").then(resp => {
+      this.$axios.get("/roommodel/room/listAll").then(resp => {
           this.transferTotalData = []
           for(let one of resp.data.data){
               let toPush ={key:'',label:''}
@@ -170,7 +170,7 @@ export default class RoomGroup extends Vue {
 
   // 把模态框里的数据投到服务器 
   private postGroup(){
-      axios.post("/roommodel/roomgroup",this.groupInModal).then(resp =>{
+      this.$axios.post("/roommodel/roomgroup",this.groupInModal).then(resp =>{
           // 用nextTick可以异步把modalLoading变成可loading的
           this.modalLoading = false
           this.$nextTick(() =>{
@@ -196,7 +196,7 @@ export default class RoomGroup extends Vue {
   }
   // 获得所有房间组别的数据
   private getAllRoomGroups(){
-     axios.get("/roommodel/roomgroup").then((resp)=>{
+     this.$axios.get("/roommodel/roomgroup").then((resp)=>{
          this.tableData = resp.data.data
          if(!this.tableData){
              this.tableData = []

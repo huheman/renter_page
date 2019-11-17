@@ -75,7 +75,7 @@ export default class App extends Vue {
 
   /**把房间的改动传给服务器 */
   private postRoom() {
-    axios.post("/roommodel/room", this.roomInModal).then(resp => {
+    this.$axios.post("/roommodel/room", this.roomInModal).then(resp => {
       // 先把loading停了先
       this.modalLoading = false;
       this.$nextTick(() => {

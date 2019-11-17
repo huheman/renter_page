@@ -1,7 +1,8 @@
 "use strict";
 
-import axios from "axios";
+import axios from "axios"
 import iView from 'iview'
+import {Vue} from 'vue-property-decorator'
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
@@ -36,6 +37,7 @@ _axios.interceptors.response.use(
         iView.Message.error("服务器出错！")
         break;
       case 10000:
+        // 10000是fail
         if (response.data.msg){
           let msg = response.data.msg
           if(msg.search('important:')>-1){
@@ -51,6 +53,7 @@ _axios.interceptors.response.use(
         }
         break;
       case 30000:
+        // 30000是空
         let msg= '未找到数据'
         if(response.data.msg!=undefined){
           msg = response.data.msg

@@ -91,7 +91,7 @@ export default class App extends Vue {
     }
 
     private postRenter(){
-      axios.post("/rentermodel/renter",this.renterInModal).then(resp => {
+      this.$axios.post("/rentermodel/renter",this.renterInModal).then(resp => {
         this.modalLoading = false;
         this.$nextTick(()=>{
           this.modalLoading = true;
@@ -122,7 +122,7 @@ export default class App extends Vue {
     }
 
     mounted(){
-      axios.get("/roommodel/room/listAll").then(resp => {
+      this.$axios.get("/roommodel/room/listAll").then(resp => {
           this.allRooms = resp.data.data
       })
     }
