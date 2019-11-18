@@ -1,0 +1,213 @@
+{
+    "resultFlag": 40000,
+    "msg": "查询成功",
+    "data": {
+        "totalCount": 19,
+        "pageSize": 10,
+        "currentPage": 1,
+        "list": [
+            {
+                "id": 48,
+                "roomName": "202",
+                "roomDesc": "什么东西？",
+                "roomStatus": 1,
+                "renterList": [
+                    {
+                        "id": 2,
+                        "name": "李四",
+                        "gender": 1,
+                        "mobile": "283748261823",
+                        "wechatNum": "283jdi",
+                        "creditNum": "283748291827387300",
+                        "isPrimary": 1,
+                        "roomId": 48,
+                        "birthday": "1990-05-08",
+                        "age": 29
+                    }
+                ],
+                "roomGroupIdList": [
+                    20
+                ],
+                "renterIdList": [
+                    2
+                ],
+                "chargeTemplateIdList": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            {
+                "id": 8,
+                "roomName": "203",
+                "roomDesc": "111123",
+                "roomStatus": 1,
+                "renterList": [
+                    {
+                        "id": 3,
+                        "name": "王五",
+                        "gender": 0,
+                        "mobile": "1827384928",
+                        "wechatNum": "2314",
+                        "creditNum": "1234123",
+                        "isPrimary": 1,
+                        "roomId": 8,
+                        "birthday": "1990-05-08",
+                        "age": 29
+                    }
+                ],
+                "roomGroupIdList": [
+                    20
+                ],
+                "renterIdList": [
+                    3
+                ],
+                "chargeTemplateIdList": [
+                    1
+                ]
+            },
+            {
+                "id": 21,
+                "roomName": "302",
+                "roomDesc": "来一点描述2323",
+                "roomStatus": 1,
+                "renterList": [
+                    {
+                        "id": 10,
+                        "name": "什么人",
+                        "gender": 1,
+                        "mobile": "13392096421",
+                        "wechatNum": "1fff",
+                        "creditNum": "2323",
+                        "isPrimary": 1,
+                        "roomId": 21,
+                        "birthday": "2017-11-07",
+                        "age": 2
+                    }
+                ],
+                "roomGroupIdList": [],
+                "renterIdList": [
+                    10
+                ],
+                "chargeTemplateIdList": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            {
+                "id": 9,
+                "roomName": "303",
+                "roomDesc": "444",
+                "roomStatus": 1,
+                "renterList": [
+                    {
+                        "id": 1,
+                        "name": "张三",
+                        "gender": 0,
+                        "mobile": "16099877340",
+                        "wechatNum": "hepeng",
+                        "creditNum": "440592827617253",
+                        "isPrimary": 1,
+                        "roomId": 9,
+                        "birthday": "1990-09-20",
+                        "age": 29
+                    }
+                ],
+                "roomGroupIdList": [
+                    21
+                ],
+                "renterIdList": [
+                    1
+                ],
+                "chargeTemplateIdList": [
+                    1,
+                    2
+                ]
+            },
+            {
+                "id": 31,
+                "roomName": "304",
+                "roomDesc": "来点描述",
+                "roomStatus": 0,
+                "renterList": [],
+                "roomGroupIdList": [
+                    22,
+                    23
+                ],
+                "renterIdList": [],
+                "chargeTemplateIdList": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            {
+                "id": 11,
+                "roomName": "404",
+                "roomDesc": "没什么描述的",
+                "roomStatus": 0,
+                "renterList": [],
+                "roomGroupIdList": [
+                    22
+                ],
+                "renterIdList": [],
+                "chargeTemplateIdList": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            {
+                "id": 34,
+                "roomName": "405",
+                "roomDesc": "",
+                "roomStatus": 0,
+                "renterList": [],
+                "roomGroupIdList": [
+                    23
+                ],
+                "renterIdList": [],
+                "chargeTemplateIdList": [
+                    1,
+                    2,
+                    3
+                ]
+            },
+            {
+                "id": 35,
+                "roomName": "406",
+                "roomDesc": "",
+                "roomStatus": 0,
+                "renterList": [],
+                "roomGroupIdList": [],
+                "renterIdList": [],
+                "chargeTemplateIdList": []
+            },
+            {
+                "id": 13,
+                "roomName": "501",
+                "roomDesc": "501哈哈",
+                "roomStatus": 0,
+                "renterList": [],
+                "roomGroupIdList": [
+                    23
+                ],
+                "renterIdList": [],
+                "chargeTemplateIdList": []
+            },
+            {
+                "id": 20,
+                "roomName": "503",
+                "roomDesc": "挖到",
+                "roomStatus": 0,
+                "renterList": [],
+                "roomGroupIdList": [
+                    23
+                ],
+                "renterIdList": [],
+                "chargeTemplateIdList": []
+            }
+        ]
+    }
+}

@@ -25,6 +25,8 @@
     <RoomPropertiesModal ref="roomPropertiesModal" :allGroups='allGroups' :renterList='renterList' @onPostRoom='reflashCurrentTable'></RoomPropertiesModal>
     <!-- 入住表格模态框 -->
     <MoveInModal ref="moveInModal"  :renterList='renterList' @newRenter='newRenter' @hasMoveIn='reflashCurrentTable();fetchAllRenterList()' @modifyDegrees='showModifyDegreeModal' ></MoveInModal>
+    <!-- 搬出表格模态框 -->
+    <MoveOutModal ref="moveOutModal"  :totalTemplate='totalTemplate' :renterList='renterList' @hasMoveOut='reflashCurrentTable()'></MoveOutModal>
     <!-- 新建租户模态框 -->
     <RenterModal ref='renterModal' @onPostSuccess='onNewRenterPostSuccess'></RenterModal>
   </div>
@@ -40,13 +42,15 @@ import RenterModal from "@/components/renter-modal.vue"
 import RoomPropertiesModal from '@/components/room-properties-modal.vue'
 import MoveInModal from '@/components/move-in-modal.vue'
 import DegreeModal from '@/components/degree-modify-modal.vue'
+import MoveOutModal from '@/components/move-out-modal.vue'
 @Component({
   components: {
     RoomTable,
     RenterModal,
     RoomPropertiesModal,
     MoveInModal,
-    DegreeModal
+    DegreeModal,
+    MoveOutModal
   }
 })
 export default class App extends Vue {
@@ -72,6 +76,11 @@ export default class App extends Vue {
 
   get moveInModal(){
     let target:any = this.$refs.moveInModal
+    return target
+  }
+
+  get moveOutModal(){
+    let target:any = this.$refs.moveOutModal
     return target
   }
   mounted() {
@@ -180,7 +189,7 @@ export default class App extends Vue {
   }
 
   private moveOut(roomToMoveOut){
-
+    this.moveOutModal.setRoomToMoveOut(roomToMoveOut)
   }
 }
 </script>

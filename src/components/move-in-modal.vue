@@ -138,9 +138,6 @@ export default class App extends Vue {
     })
   }
 
-  get realChargeTemplateIdList(){
-    return this.roomToMoveIn.chargeTemplateIdList?this.roomToMoveIn.chargeTemplateIdList:[]
-  }
 
   @Watch("moveInDate")
   @Watch("period")
