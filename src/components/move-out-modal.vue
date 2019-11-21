@@ -51,7 +51,7 @@
           </col>
           </Row>
       </Form>
-      <DegreeModifyDiv ref="degreeModifyDiv" :totalTemplate='totalTemplate' :moveOutDate='roomToPost.moveOutDate'/>
+      <DegreeModifyDiv ref="degreeModifyDiv" :totalTemplate='totalTemplate' :isMoveOut='true'/>
   </Modal>
 </template>
 
@@ -86,7 +86,7 @@ export default class App extends Vue {
 
   get howLong(){
     if (this.roomToPost.moveInDate && this.roomToPost.moveOutDate){
-      let dura = moment(this.roomToPost.moveOutDate).valueOf() - moment(this.roomToPost.moveInDate).valueOf()
+      let dura = moment(this.roomToPost.moveOutDate).diff(moment(this.roomToPost.moveInDate))
       if (dura <0) return '搬出时间不能小于入住时间'
       let duration = moment.duration(dura)
       let durationStr =  (duration.years() ?  duration.years() + '年' :'') + (duration.months() ? duration.months() + '个月' : '') + (duration.days() ?duration.days() + '天':'')
@@ -96,7 +96,6 @@ export default class App extends Vue {
   }
 
   public setRoomToMoveOut(roomToMoveOut){
-    
     this.roomToMoveOut = roomToMoveOut
     this.$axios.get('/rentermodel/renter/getScheduleMoveOutBOByRoomId',{params:{roomId:roomToMoveOut.id}}).then(resp => {
       if (resp.data.resultFlag === 40000) {
@@ -110,6 +109,7 @@ export default class App extends Vue {
 
   private moveOut(){
       this.roomToPost.roomDegreeDTO = this.degreeModifyDiv.getRoomDegrees()
+      this.$axios.post("/rentermodel/renter/getScheduleMoveOutBOByRoomId")
   }
 
   @Emit("hasMoveOut") private hasMoveOut(){

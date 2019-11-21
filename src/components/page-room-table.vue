@@ -1,6 +1,6 @@
 <template>
     <div>
-  <Table :columns='columns' :data='data'>
+  <Table :columns='columns' :data='data' :loading='loading'>
       <template  slot-scope="{row}" slot="roomName">
         <Tooltip  v-if="row.roomDesc" trigger="hover"  :content="row.roomDesc" placement="top-start">
             <a style="cursor:default" >{{row.roomName}}</a>
@@ -24,8 +24,8 @@
       <template slot='action' slot-scope="{row,index}">
           <a @click.prevent='$emit("toModifyRoomInfo",row)'><Icon type="md-build" /> 设置房间信息</a>
           <Divider type='vertical'></Divider>
-          <a @click.prevent='$emit("toModifyBillInfo",row)'><Icon type="logo-usd" /> 设置费用信息</a>
-          <Divider type='vertical'></Divider>
+          <a @click.prevent='$emit("toModifyBillInfo",row)' v-if="row.canSetupMoveInDegree"><Icon type="logo-usd" /> 设置初始费用</a>
+          <Divider type='vertical' v-if="row.canSetupMoveInDegree"></Divider>
           <a @click.prevent='toDelete(index)'><Icon type="md-close" />删除</a>
       </template>
       <template slot="roomManage" slot-scope="{row,index}">
@@ -80,17 +80,25 @@ export default class App extends Vue {
             slot: 'action',
         }
     ]
+    private loading = false;
     private spinShow =true // 是否显示loading
     private data = []
     private total = 0
     public getRoomMsgByPage(){
+        this.loading = true
         // 创建查询对象
         if(this.roomGroupIdList)
             this.conditionToPost.roomGroupIdList = this.roomGroupIdList.join(',')
         // 把查询对象传给后台，获取对应的房间列表
         this.$axios.get("/roommodel/room",{params:this.conditionToPost}).then(resp => {
+            this.loading = false
             this.data = resp.data.data.list
             this.total = resp.data.data.totalCount
+            for (const room of this.data) {
+                this.$axios.get("/chargemodel/chargeTemplate/canSetupMoveInRoomDegrees",{params:{roomId: room.id}}).then(resp => {
+                    this.$set(room,'canSetupMoveInDegree',resp.data.data)
+                })
+            }
         })
     }
     handlePageChange(page){

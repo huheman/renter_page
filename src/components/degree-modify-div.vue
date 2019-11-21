@@ -9,7 +9,7 @@
     <div style="position: relative">
       <Spin fix v-if="spinLoading"></Spin>
       <Row v-for="degreeToModify in roomDegrees.degreeList" :key="degreeToModify.chargeTemplateId" :gutter='12'>
-        <Col :span='moveOutDate ? "24" : "10"'>
+        <Col :span='isMoveOut ? "24" : "10"'>
           <FormItem  required >
             <span slot="label"><span style='color:blue'>{{findTemplateName(degreeToModify.chargeTemplateId)}}</span>读数</span>
             <Tooltip :content=' (degreeToModify.coverDegreeStart ?  "最近一次读数数值为：" + degreeToModify.coverDegreeStart :"暂未有最近读数记录")' style="width:100%" placement="top">
@@ -23,14 +23,14 @@
             </Tooltip>
           </FormItem>
         </Col>
-        <Col span="10" v-if='!moveOutDate'>
+        <Col span="10" v-if='!isMoveOut'>
           <FormItem label="读数生效时间" required >
             <Tooltip :content='(degreeToModify.coverWhenStart ? "最近一次读数时间为：" + formateDate(degreeToModify.coverWhenStart) : "暂未有最近读数记录")' placement="top">
               <DatePicker v-model="degreeToModify.coverWhenEnd" :clearable="false" style="width:100%" :disabled='!degreeToModify.active' ></DatePicker>
             </Tooltip>
           </FormItem>
         </Col>
-        <Col span="4" v-if='!moveOutDate'>
+        <Col span="4" v-if='!isMoveOut'>
           <FormItem :label-width="0">
             <Checkbox v-model="degreeToModify.active">修改开关</Checkbox>
           </FormItem>
@@ -56,6 +56,7 @@ export default class App extends Vue {
     // 以moveOutDate作为所有读数的cover_when_end
     // 并且所有读数默认激活
     @Prop() private moveOutDate!:Date
+    @Prop() private isMoveOut!:boolean
     private roomToModify:any={chargeTemplateIdList:[]}
     private roomDegrees:any = {degreeList:[]}
     private spinLoading = true
@@ -63,9 +64,19 @@ export default class App extends Vue {
     public setRoomToModify(roomToModify){
         this.roomToModify = roomToModify
         this.spinLoading = true
-        // 获取此房间现在的度数
-        this.$axios.get("/chargemodel/chargeTemplate/queryRoomDegrees",{params:{roomId: roomToModify.id}})
+        // 获取此房间现在的度数，如果是用于设置入住时初始值，则要求bill的type为基础bill或搬出bill
+        let url = '/chargemodel/chargeTemplate/queryMoveInRoomDegrees'
+        if (this.isMoveOut) {
+          // 如果是用于设置搬出的值，则要求bill为已审核，已生成，type为基础bill
+          url = '/chargemodel/chargeTemplate/queryMoveOutRoomDegrees'
+        }
+        this.$axios.get(url,{params:{roomId: roomToModify.id}})
         .then(resp => {
+          // 如果有什么数据
+          if (resp.data.resultFlag != 40000){
+            this.$emit('onFail')
+            return
+          }
           this.roomDegrees = resp.data.data
           this.roomDegrees.degreeList.forEach(element => {
             // 如果时间end为空，说明没有过bill，可以则把时间end设为今日
@@ -83,7 +94,7 @@ export default class App extends Vue {
               element.coverDegreeStart = element.coverDegreeEnd
             }
             // 如果处于moveOut模式，则把active设为ture
-            if (this.moveOutDate){
+            if (this.isMoveOut){
               element.active = true
             }
           })
@@ -92,12 +103,6 @@ export default class App extends Vue {
     }
 
     public getRoomDegrees(){
-      // 如果处于moveOut模式，则把所有Degree的cover_when_end全部设置为moveOutDate
-      if (this.moveOutDate) {
-        this.roomDegrees.degreeList.forEach(element => {
-          element.coverWhenEnd = this.moveOutDate
-        })
-      }
       return this.roomDegrees;
     }
 

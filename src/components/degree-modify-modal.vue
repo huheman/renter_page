@@ -4,7 +4,7 @@
       :loading="modalLoading"
       width="650"
       @on-ok="modifyDegree">
-    <DegreeModifyDiv ref="degreeModifyDiv" :totalTemplate='totalTemplate'/>
+    <DegreeModifyDiv ref="degreeModifyDiv" :totalTemplate='totalTemplate' @onFail='modalShow = false'/>
 </Modal>
 </template>
 
@@ -31,7 +31,7 @@ export default class App extends Vue {
 
     private modifyDegree() {
       let roomDegrees = this.degreeModifyDiv.getRoomDegrees()
-      this.$axios.post("/chargemodel/chargeTemplate/modifyDegrees",roomDegrees).then(resp => {
+      this.$axios.post("/chargemodel/chargeTemplate/postMoveInDegrees",roomDegrees).then(resp => {
         this.modalLoading = false
         this.$nextTick(() => {
           this.modalLoading = true

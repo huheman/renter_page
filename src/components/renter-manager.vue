@@ -111,7 +111,7 @@ export default class App extends Vue {
         this.$Modal.confirm({
             content: '是否要删除住户'+row.name,
             onOk: ()=>{
-                axios({
+                this.$axios({
                     method: 'delete',
                     url: '/rentermodel/renter',
                     params:{

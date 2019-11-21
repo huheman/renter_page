@@ -65,11 +65,9 @@
             </FormItem>
           </Col>
           <Col span='6'>
-          <Button type="info" long @click="modifyDegrees">编辑各项初始读数</Button>
+          <Button type="info" long @click="modifyDegrees" v-if="roomToMoveIn.canSetupMoveInDegree">编辑各项初始读数</Button>
           </col>
           </Row>
-          
-         
       </Form>
   </Modal>
 </template>
@@ -104,7 +102,7 @@ export default class App extends Vue {
     if (this.moveOutDate){
       this.objToPost.expectMoveOutDate = moment(this.moveOutDate).format('YYYY-MM-DD')
     }
-    this.$axios.post("/roommodel/room/moveIn",this.objToPost).then(resp => {
+    this.$axios.post("/rentermodel/renter/moveIn",this.objToPost).then(resp => {
       this.modalLoading=false
       this.$nextTick(() =>{
         this.modalLoading = true
