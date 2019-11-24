@@ -51,7 +51,7 @@
           </col>
           </Row>
       </Form>
-      <DegreeModifyDiv ref="degreeModifyDiv" :totalTemplate='totalTemplate' :isMoveOut='true'/>
+      <DegreeModifyDiv ref="degreeModifyDiv" :totalTemplate='totalTemplate' :isMoveOut='true' @onFail='modalShow=false'/>
   </Modal>
 </template>
 
@@ -109,7 +109,9 @@ export default class App extends Vue {
 
   private moveOut(){
       this.roomToPost.roomDegreeDTO = this.degreeModifyDiv.getRoomDegrees()
-      this.$axios.post("/rentermodel/renter/getScheduleMoveOutBOByRoomId")
+      this.$axios.post("/rentermodel/renter/moveOut",this.roomToPost).then(resp => {
+        this.hasMoveOut()
+      })
   }
 
   @Emit("hasMoveOut") private hasMoveOut(){

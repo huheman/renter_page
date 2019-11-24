@@ -40,8 +40,9 @@ _axios.interceptors.response.use(
         // 10000是fail
         if (response.data.msg){
           let msg = response.data.msg
-          if(msg.search('important:')>-1){
-            msg = msg.substring(15)
+          let pos = msg.search('important:')
+          if(pos>-1){
+            msg = msg.substring(pos+10)
             iView.Modal.warning({
               title: '警告',
               content: msg

@@ -94,11 +94,17 @@ export default class App extends Vue {
             this.loading = false
             this.data = resp.data.data.list
             this.total = resp.data.data.totalCount
-            for (const room of this.data) {
-                this.$axios.get("/chargemodel/chargeTemplate/canSetupMoveInRoomDegrees",{params:{roomId: room.id}}).then(resp => {
-                    this.$set(room,'canSetupMoveInDegree',resp.data.data)
-                })
-            }
+
+            // 根据roomId返回房间是否可入住
+            let roomIdList = this.data.map(room =>{
+                return room.id
+            })
+            this.$axios.post("/chargemodel/chargeTemplate/canSetupMoveInRoomDegrees",roomIdList).then(resp => {
+                for (const key in this.data) {
+                    this.$set(this.data[key],'canSetupMoveInDegree',resp.data.data[key])
+                }
+            })
+            
         })
     }
     handlePageChange(page){

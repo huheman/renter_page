@@ -81,16 +81,20 @@ export default class App extends Vue {
           this.roomDegrees.degreeList.forEach(element => {
             // 如果时间end为空，说明没有过bill，可以则把时间end设为今日
             if(!element.coverWhenEnd){
+              element.active = true
               element.coverWhenEnd = moment().format('YYYY-MM-DD HH:mm:ss')
             } else {
               // 如果时间end有值，则把时间start设为时间end
+              element.active = false
               element.coverWhenStart = element.coverWhenEnd
             }
             // 如果coverDegreeEnd为空，说明没有过bill，则把coverDegreeEnd设为0
             if(!element.coverDegreeEnd){
+              element.active= true
               element.coverDegreeEnd = 0
             } else {
               // 否则把coverStart设为coverEnd
+              element.active = false
               element.coverDegreeStart = element.coverDegreeEnd
             }
             // 如果处于moveOut模式，则把active设为ture
