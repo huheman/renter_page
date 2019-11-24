@@ -110,6 +110,9 @@ export default class App extends Vue {
   private moveOut(){
       this.roomToPost.roomDegreeDTO = this.degreeModifyDiv.getRoomDegrees()
       this.$axios.post("/rentermodel/renter/moveOut",this.roomToPost).then(resp => {
+        this.modalShow = false
+        if (resp.data.resultFlag == 20000)
+        this.$Message.success('退房成功！')
         this.hasMoveOut()
       })
   }
