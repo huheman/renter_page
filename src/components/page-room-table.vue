@@ -35,7 +35,7 @@
           <Button v-else type='info'  @click="moveIn(row)">入住</Button>
       </template>
   </Table>
-  <Page style="margin: 10px auto" :total="total" show-total show-sizer @on-change='handlePageChange' @on-page-size-change='handlePageSizeChange'></Page>
+  <Page style="margin: 10px auto" :total="total" show-total show-sizer @on-change='handlePageChange' @on-page-size-change='handlePageSizeChange' transfer></Page>
     </div>
     
 </template>

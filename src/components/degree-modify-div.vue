@@ -82,7 +82,7 @@ export default class App extends Vue {
             // 如果时间end为空，说明没有过bill，可以则把时间end设为今日
             if(!element.coverWhenEnd){
               element.active = true
-              element.coverWhenEnd = moment().format('YYYY-MM-DD HH:mm:ss')
+              element.coverWhenEnd = moment().format('YYYY-MM-DD')
             } else {
               // 如果时间end有值，则把时间start设为时间end
               element.active = false

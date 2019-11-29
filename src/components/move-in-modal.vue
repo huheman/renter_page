@@ -94,6 +94,8 @@ export default class App extends Vue {
     this.roomToMoveIn = roomToMoveIn
     this.objToPost = {renterIdList:[],deposit:500,roomId: roomToMoveIn.id}
     this.period = 0
+    this.moveInDate = new Date()
+    this.moveOutDate = null
     this.modalShow=true
   }
 

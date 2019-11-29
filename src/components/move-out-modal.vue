@@ -3,7 +3,7 @@
       :title="modalTitle"
       :loading="modalLoading"
       width="550"
-      @on-ok="moveOut">
+      >
       <Form :label-width="100">
         <Row >
           <Col span="12">
@@ -52,6 +52,19 @@
           </Row>
       </Form>
       <DegreeModifyDiv ref="degreeModifyDiv" :totalTemplate='totalTemplate' :isMoveOut='true' @onFail='modalShow=false'/>
+      <Form :label-width="100" v-if="calculateResult">
+         <FormItem :label="showFactor.factorDesc" v-for="(showFactor , index) in calculateResult.showFactorList" :key="index" >
+            <Input readonly :value='showFactor.factorFormula' />
+         </FormItem>
+         <FormItem label="合计">
+            <Input readonly :value='calculateResult.totalFormula' />
+         </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="text"  @click="modalShow=false">取消</Button>
+        <Button type="success"  @click="preCalculateMoveOutBill">预览搬出账单</Button>
+        <Button type="primary"  @click="moveOut">确定</Button>
+      </div>
   </Modal>
 </template>
 
@@ -71,6 +84,7 @@ export default class App extends Vue {
   private modalShow:boolean = false
   private modalTitle:string = '房间搬出'
   private modalLoading:boolean = true
+  private calculateResult = null
 
   get degreeModifyDiv(){
       let target:any = this.$refs.degreeModifyDiv
@@ -111,10 +125,20 @@ export default class App extends Vue {
       this.roomToPost.roomDegreeDTO = this.degreeModifyDiv.getRoomDegrees()
       this.$axios.post("/rentermodel/renter/moveOut",this.roomToPost).then(resp => {
         this.modalShow = false
-        if (resp.data.resultFlag == 20000)
-        this.$Message.success('退房成功！')
-        this.hasMoveOut()
+        if (resp.data.resultFlag == 20000) {
+          this.$Message.success('退房成功！')
+          this.hasMoveOut()
+        }
       })
+  }
+
+  private preCalculateMoveOutBill() {
+    this.roomToPost.roomDegreeDTO = this.degreeModifyDiv.getRoomDegrees()
+    this.$axios.post("/chargemodel/chargeTemplate/preCalculateMoveOutBill",this.roomToPost).then(resp => {
+      if(resp.data.resultFlag == 40000) {
+        this.calculateResult = resp.data.data
+      }
+    })
   }
 
   @Emit("hasMoveOut") private hasMoveOut(){
